@@ -3,8 +3,11 @@ import anthropic
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 import os
-TOKEN = os.environ.get("TOKEN")
+TOKEN = "8781391896:AAH9dNTYHtx0Qj6BVCSaFMz_qRtvZuuOOVY"
+#TOKEN = os.environ.get("TOKEN")
 ANTHROPIC_KEY = os.environ.get("ANTHROPIC_KEY")
+print(f"TOKEN получен: {TOKEN is not None}")  # добавь эту строку
+
 
 client = anthropic.Anthropic(api_key=ANTHROPIC_KEY)
 
