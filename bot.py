@@ -1,3 +1,4 @@
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import yfinance as yf
 import anthropic
 from telegram import Update
@@ -85,12 +86,35 @@ async def analyze(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(f"🤖 ИИ Анализ:\n\n{analysis}")
 
 
+async def morning_report(bot):
+    chat_id = 5447942728
+
+    tickers = {"Apple": "AAPL", "Tesla": "TSLA", "Microsoft": "MSFT"}
+    pairs = {"EUR/USD": "EURUSD=X", "GBP/USD": "GBPUSD=X", "DXY": "DX-Y.NYB"}
+
+    msg = "🌅 Доброе утро! Рыночный отчёт:\n\n"
+
+    msg += "📈 Акции:\n"
+    for name, ticker in tickers.items():
+        price = yf.Ticker(ticker).fast_info.last_price
+        msg += f"{name}: ${price:.2f}\n"
+
+    msg += "\n💱 Валюты:\n"
+    for name, ticker in pairs.items():
+        price = yf.Ticker(ticker).fast_info.last_price
+        msg += f"{name}: {price:.5f}\n"
+
+    await bot.send_message(chat_id=chat_id, text=msg)
+
 def main():
     app = Application.builder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("stocks", stocks))
     app.add_handler(CommandHandler("currency", currency))
     app.add_handler(CommandHandler("analyze", analyze))
+    scheduler = AsyncIOScheduler()
+    scheduler.add_job(morning_report, 'cron', hour=9, minute=0, args=[app.bot])
+    scheduler.start()
     app.run_polling()
 
 
